@@ -45,3 +45,21 @@
 ## Indexing Strategy
 
 ## Migration Rules
+
+## Design Decisions
+
+### Soft Deletes
+
+Business entities support `deletedAt` to allow recovery of accidentally deleted data.
+
+### Indexing
+
+Indexes added to frequently searched fields.
+
+### Address Storage
+
+Structured address fields replace a single address column.
+
+### Department Codes
+
+Departments use short unique codes for reporting.
