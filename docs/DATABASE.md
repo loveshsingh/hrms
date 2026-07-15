@@ -225,3 +225,14 @@ Rules:
 - Snapshot of calculated values.
 - Never recalculate historical payroll.
 - One payroll item per employee per payroll run.
+
+## PayrollItemComponent
+
+Stores the detailed earnings and deductions for one employee's payroll.
+
+Design Principles:
+
+- Snapshot component names.
+- Snapshot calculation types.
+- Preserve historical payroll.
+- One PayrollItem contains many PayrollItemComponents.
