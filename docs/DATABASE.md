@@ -74,3 +74,23 @@ Rules:
 - Authentication resolves the current company.
 - Queries are always filtered by companyId.
 - Cross-company access is prohibited.
+
+## Employee Domain
+
+### Employee
+
+Stores employee master data.
+
+### BankAccount
+
+One primary bank account per employee.
+
+Future enhancement:
+- Multiple accounts
+- Salary account history
+
+### EmployeeDocument
+
+Stores metadata for uploaded files.
+
+Actual files are stored in Supabase Storage.

@@ -33,6 +33,20 @@ enum EmployeeStatus {
   TERMINATED
 }
 
+enum DocumentType {
+  PROFILE_PHOTO
+  AADHAAR
+  PAN
+  PASSPORT
+  RESUME
+  OFFER_LETTER
+  APPOINTMENT_LETTER
+  EXPERIENCE_LETTER
+  RELIEVING_LETTER
+  SALARY_SLIP
+  OTHER
+}
+
 model User {
   id          String   @id @default(cuid())
   supabaseId  String   @unique
@@ -68,6 +82,8 @@ model Company {
 
   users User[]
   employees Employee[]
+  bankAccounts BankAccount[]
+  documents EmployeeDocument[]
 }
 
 model Role {
@@ -158,6 +174,10 @@ model Employee {
   departmentId       String
   designationId      String
 
+  bankAccount BankAccount?
+
+  documents EmployeeDocument[]
+
   company            Company           @relation(fields: [companyId], references: [id])
 
   department         Department        @relation(fields: [departmentId], references: [id])
@@ -174,4 +194,79 @@ model Employee {
   @@index([departmentId])
   @@index([designationId])
   @@index([status])
+}
+
+model BankAccount {
+  id              String   @id @default(cuid())
+
+  employeeId      String   @unique
+
+  companyId       String
+
+  bankName        String
+
+  branchName      String?
+
+  accountHolder   String
+
+  accountNumber   String
+
+  ifscCode        String
+
+  accountType     String?
+
+  isPrimary       Boolean @default(true)
+
+  createdAt       DateTime @default(now())
+
+  updatedAt       DateTime @updatedAt
+
+  deletedAt       DateTime?
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+
+  @@index([employeeId])
+}
+
+model EmployeeDocument {
+
+  id String @id @default(cuid())
+
+  employeeId String
+
+  companyId String
+
+  type DocumentType
+
+  fileName String
+
+  fileUrl String
+
+  fileSize Int?
+
+  mimeType String?
+
+  remarks String?
+
+  uploadedAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  deletedAt DateTime?
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@index([employeeId])
+
+  @@index([companyId])
+
+  @@index([type])
 }
