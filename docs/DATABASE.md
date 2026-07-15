@@ -63,3 +63,14 @@ Structured address fields replace a single address column.
 ### Department Codes
 
 Departments use short unique codes for reporting.
+
+## Multi-Tenant Strategy
+
+Tenant = Company
+
+Rules:
+
+- Every business table contains companyId.
+- Authentication resolves the current company.
+- Queries are always filtered by companyId.
+- Cross-company access is prohibited.

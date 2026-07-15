@@ -844,3 +844,13 @@ The project will be considered successful when:
 - Cloud-Native Deployment
 - Reliable Data Integrity
 - Continuous Improvement
+
+## Architecture Decision
+
+This HRMS is designed as a multi-tenant application.
+
+Each business entity belongs to exactly one company.
+
+All business queries must be scoped by companyId.
+
+This architecture enables future SaaS expansion while supporting the current single-company deployment.
