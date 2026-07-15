@@ -22,3 +22,12 @@ employeeId
 companyId
 
 departmentId
+
+## Backend Rules
+
+- Routes remain thin.
+- Business logic belongs in services.
+- Database access belongs in repositories.
+- Validate all input.
+- Never access Prisma directly from UI components.
+- Use feature-based organization.
