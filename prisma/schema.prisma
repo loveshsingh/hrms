@@ -269,6 +269,7 @@ model Employee {
   @@index([departmentId])
   @@index([designationId])
   @@index([status])
+  @@index([companyId])
 }
 
 model BankAccount {
@@ -663,6 +664,8 @@ model PayrollItem {
   @@unique([payrollRunId, employeeId])
 
   @@index([companyId])
+
+  @@index([payrollRunId])
 
   @@index([employeeId])
 
