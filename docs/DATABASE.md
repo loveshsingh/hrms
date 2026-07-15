@@ -94,3 +94,21 @@ Future enhancement:
 Stores metadata for uploaded files.
 
 Actual files are stored in Supabase Storage.
+
+## Attendance
+
+Purpose:
+Stores one attendance record per employee per working day.
+
+Rules:
+- One record per employee per date.
+- Stores working minutes.
+- Stores overtime separately.
+- Supports remarks.
+- Belongs to one company.
+
+Indexes:
+- employeeId
+- attendanceDate
+- status
+- companyId
