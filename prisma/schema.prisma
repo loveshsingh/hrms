@@ -56,6 +56,29 @@ enum AttendanceStatus {
   WEEK_OFF
 }
 
+enum LeaveTypeCategory {
+  CASUAL
+  SICK
+  EARNED
+  LOSS_OF_PAY
+  MATERNITY
+  PATERNITY
+  OTHER
+}
+
+enum LeaveRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum LeaveDuration {
+  FULL_DAY
+  FIRST_HALF
+  SECOND_HALF
+}
+
 model User {
   id          String   @id @default(cuid())
   supabaseId  String   @unique
@@ -94,6 +117,11 @@ model Company {
   bankAccounts BankAccount[]
   documents EmployeeDocument[]
   attendance Attendance[]
+  leaveTypes LeaveType[]
+
+  leaveRequests LeaveRequest[]
+
+  leaveBalances LeaveBalance[]
 }
 
 model Role {
@@ -189,6 +217,10 @@ model Employee {
   documents EmployeeDocument[]
 
   attendance Attendance[]
+
+  leaveRequests LeaveRequest[]
+
+  leaveBalances LeaveBalance[]
 
   company            Company           @relation(fields: [companyId], references: [id])
 
@@ -322,4 +354,123 @@ model Attendance {
   @@index([status])
 
   @@index([employeeId])
+}
+
+model LeaveType {
+
+  id String @id @default(cuid())
+
+  companyId String
+
+  name String
+
+  code String
+
+  category LeaveTypeCategory
+
+  isPaid Boolean @default(true)
+
+  annualAllocation Int
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  deletedAt DateTime?
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  leaveRequests LeaveRequest[]
+
+  leaveBalances LeaveBalance[]
+
+  @@unique([companyId, code])
+
+  @@index([companyId])
+}
+
+model LeaveRequest {
+
+  id String @id @default(cuid())
+
+  employeeId String
+
+  companyId String
+
+  leaveTypeId String
+
+  startDate DateTime
+
+  endDate DateTime
+
+  totalDays Float
+
+  duration LeaveDuration
+
+  reason String?
+
+  status LeaveRequestStatus @default(PENDING)
+
+  approvedByUserId String?
+
+  approvedAt DateTime?
+
+  rejectionReason String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  deletedAt DateTime?
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  leaveType LeaveType @relation(fields: [leaveTypeId], references: [id])
+
+  @@index([employeeId])
+
+  @@index([companyId])
+
+  @@index([status])
+
+  @@index([startDate])
+
+}
+
+model LeaveBalance {
+
+  id String @id @default(cuid())
+
+  employeeId String
+
+  companyId String
+
+  leaveTypeId String
+
+  year Int
+
+  allocated Float
+
+  used Float
+
+  remaining Float
+
+  carriedForward Float @default(0)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  leaveType LeaveType @relation(fields: [leaveTypeId], references: [id])
+
+  @@unique([employeeId, leaveTypeId, year])
+
+  @@index([companyId])
+
 }

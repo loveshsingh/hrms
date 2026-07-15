@@ -112,3 +112,22 @@ Indexes:
 - attendanceDate
 - status
 - companyId
+
+## Leave Module
+
+### LeaveType
+
+Defines leave policies.
+
+### LeaveRequest
+
+Stores leave applications.
+
+### LeaveBalance
+
+Stores yearly balances.
+
+Rules:
+
+- Leave balance is maintained separately.
+- Leave requests update balances after approval.
