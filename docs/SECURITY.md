@@ -17,3 +17,13 @@
 ## Logging
 
 ## Auditing
+
+## Soft Delete Policy
+
+Business records should not be permanently deleted.
+
+Instead:
+
+- Set deletedAt
+- Exclude deleted records from application queries
+- Allow administrative restoration when appropriate

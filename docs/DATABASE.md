@@ -131,3 +131,24 @@ Rules:
 
 - Leave balance is maintained separately.
 - Leave requests update balances after approval.
+
+## Audit Fields
+
+Future enhancement:
+
+- createdByUserId
+- updatedByUserId
+- deletedByUserId
+
+These fields will reference the User table and improve traceability.
+
+## Database Design Principles
+
+- Normalize master data.
+- Separate transactional data.
+- Prefer enums over free text.
+- Store file URLs, not files.
+- Use soft deletes.
+- Use indexes for common queries.
+- Support multi-tenancy.
+- Keep audit information.
