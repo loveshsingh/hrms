@@ -205,3 +205,23 @@ Supports:
 - Effective dates
 - Salary revisions
 - Unlimited components
+
+## PayrollRun
+
+Represents one payroll processing cycle.
+
+Rules:
+
+- One payroll run per company per month.
+- Payroll progresses through:
+  Draft → Calculated → Approved → Locked.
+
+## PayrollItem
+
+Stores payroll results for one employee.
+
+Rules:
+
+- Snapshot of calculated values.
+- Never recalculate historical payroll.
+- One payroll item per employee per payroll run.

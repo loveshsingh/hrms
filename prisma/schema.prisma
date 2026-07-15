@@ -89,6 +89,13 @@ enum SalaryCalculationType {
   PERCENTAGE
 }
 
+enum PayrollRunStatus {
+  DRAFT
+  CALCULATED
+  APPROVED
+  LOCKED
+}
+
 model User {
   id          String   @id @default(cuid())
   supabaseId  String   @unique
@@ -136,6 +143,10 @@ model Company {
   salaryComponents SalaryComponent[]
 
   salaryStructures SalaryStructure[]
+
+  payrollRuns PayrollRun[]
+
+  payrollItems PayrollItem[]
 }
 
 model Role {
@@ -237,6 +248,8 @@ model Employee {
   leaveBalances LeaveBalance[]
 
   salaryStructures SalaryStructure[]
+
+  payrollItems PayrollItem[]
 
   company            Company           @relation(fields: [companyId], references: [id])
 
@@ -564,5 +577,87 @@ model SalaryStructure {
   @@index([companyId])
 
   @@index([salaryComponentId])
+
+}
+
+model PayrollRun {
+
+  id String @id @default(cuid())
+
+  companyId String
+
+  payrollMonth Int
+
+  payrollYear Int
+
+  status PayrollRunStatus @default(DRAFT)
+
+  processedAt DateTime?
+
+  approvedAt DateTime?
+
+  lockedAt DateTime?
+
+  remarks String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  deletedAt DateTime?
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  payrollItems PayrollItem[]
+
+  @@unique([companyId, payrollMonth, payrollYear])
+
+  @@index([companyId])
+
+}
+
+model PayrollItem {
+
+  id String @id @default(cuid())
+
+  payrollRunId String
+
+  employeeId String
+
+  companyId String
+
+  payableDays Decimal @db.Decimal(5,2)
+
+  workingDays Decimal @db.Decimal(5,2)
+
+  overtimeMinutes Int @default(0)
+
+  grossSalary Decimal @db.Decimal(12,2)
+
+  totalEarnings Decimal @db.Decimal(12,2)
+
+  totalDeductions Decimal @db.Decimal(12,2)
+
+  netSalary Decimal @db.Decimal(12,2)
+
+  roundOff Decimal @db.Decimal(12,2)
+
+  remarks String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  payrollRun PayrollRun @relation(fields: [payrollRunId], references: [id])
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@unique([payrollRunId, employeeId])
+
+  @@index([companyId])
+
+  @@index([employeeId])
 
 }
