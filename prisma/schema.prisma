@@ -79,6 +79,16 @@ enum LeaveDuration {
   SECOND_HALF
 }
 
+enum SalaryComponentType {
+  EARNING
+  DEDUCTION
+}
+
+enum SalaryCalculationType {
+  FIXED
+  PERCENTAGE
+}
+
 model User {
   id          String   @id @default(cuid())
   supabaseId  String   @unique
@@ -122,6 +132,10 @@ model Company {
   leaveRequests LeaveRequest[]
 
   leaveBalances LeaveBalance[]
+
+  salaryComponents SalaryComponent[]
+
+  salaryStructures SalaryStructure[]
 }
 
 model Role {
@@ -221,6 +235,8 @@ model Employee {
   leaveRequests LeaveRequest[]
 
   leaveBalances LeaveBalance[]
+
+  salaryStructures SalaryStructure[]
 
   company            Company           @relation(fields: [companyId], references: [id])
 
@@ -474,5 +490,79 @@ model LeaveBalance {
   @@unique([employeeId, leaveTypeId, year])
 
   @@index([companyId])
+
+}
+
+model SalaryComponent {
+
+  id String @id @default(cuid())
+
+  companyId String
+
+  name String
+
+  code String
+
+  type SalaryComponentType
+
+  calculationType SalaryCalculationType
+
+  isStatutory Boolean @default(false)
+
+  isTaxable Boolean @default(true)
+
+  displayOrder Int @default(0)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  deletedAt DateTime?
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  salaryStructures SalaryStructure[]
+
+  @@unique([companyId, code])
+
+  @@index([companyId])
+
+}
+
+model SalaryStructure {
+
+  id String @id @default(cuid())
+
+  employeeId String
+
+  companyId String
+
+  salaryComponentId String
+
+  amount Decimal @db.Decimal(12,2)
+
+  percentage Decimal? @db.Decimal(5,2)
+
+  effectiveFrom DateTime
+
+  effectiveTo DateTime?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  deletedAt DateTime?
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  salaryComponent SalaryComponent @relation(fields: [salaryComponentId], references: [id])
+
+  @@index([employeeId])
+
+  @@index([companyId])
+
+  @@index([salaryComponentId])
 
 }

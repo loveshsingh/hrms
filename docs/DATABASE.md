@@ -181,3 +181,27 @@ Stores generated payslip metadata.
 - Attendance is the source of truth.
 - Leave affects payroll only after approval.
 - Calculations are stored, not recomputed.
+
+## Salary Components
+
+Salary components are configurable.
+
+Examples:
+
+- Basic
+- HRA
+- PF
+- ESIC
+- Bonus
+
+Each company defines its own components.
+
+## Salary Structure
+
+Stores the assigned salary components for each employee.
+
+Supports:
+
+- Effective dates
+- Salary revisions
+- Unlimited components
