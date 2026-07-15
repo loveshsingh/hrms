@@ -152,3 +152,32 @@ These fields will reference the User table and improve traceability.
 - Use indexes for common queries.
 - Support multi-tenancy.
 - Keep audit information.
+
+## Payroll Domain
+
+### SalaryStructure
+
+Defines employee compensation.
+
+### SalaryComponent
+
+Defines reusable earnings and deductions.
+
+### PayrollRun
+
+Represents one payroll cycle.
+
+### PayrollItem
+
+Stores payroll results for one employee.
+
+### Payslip
+
+Stores generated payslip metadata.
+
+### Design Principles
+
+- Payroll is immutable after locking.
+- Attendance is the source of truth.
+- Leave affects payroll only after approval.
+- Calculations are stored, not recomputed.
