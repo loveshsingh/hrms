@@ -1,5 +1,41 @@
 # Database Design
 
+## Entities
+
+- Company
+- User
+- Role
+- Employee
+- Department
+- Designation
+- Attendance
+- Leave
+- Holiday
+- Payroll
+- SalaryComponent
+- Payslip
+- BankAccount
+- EmployeeDocument
+
+## Relationships
+
+| Relationship            | Type        |
+| ----------------------- | ----------- |
+| Company → Employees     | One-to-Many |
+| Department → Employees  | One-to-Many |
+| Designation → Employees | One-to-Many |
+| Employee → Attendance   | One-to-Many |
+| Employee → Leave        | One-to-Many |
+| Employee → Payroll      | One-to-Many |
+| Employee → Documents    | One-to-Many |
+| Employee → BankAccount  | One-to-One  |
+| Role → Users            | One-to-Many |
+
+
+## ER Diagram
+
+![alt text](hrms_erd.drawio.png)
+
 ## Tables
 
 ## Relationships
