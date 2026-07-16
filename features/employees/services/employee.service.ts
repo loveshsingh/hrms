@@ -5,6 +5,7 @@ import type {
   CreateEmployeeInput,
   UpdateEmployeeInput,
 } from "../validators/employee.validator";
+import { toEmployeeResponseDto } from "../mappers/employee.mapper";
 
 export class EmployeeService {
   async create(data: CreateEmployeeInput) {
@@ -32,7 +33,7 @@ export class EmployeeService {
       throw new ApiError(404, "Employee not found.");
     }
 
-    return employee;
+    return toEmployeeResponseDto(employee);;
   }
 
   async findMany() {

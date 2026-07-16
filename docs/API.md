@@ -30,6 +30,12 @@ Error
 
 500
 
+## DTO Rule
+
+Never return Prisma models directly.
+
+Always map responses to DTOs.
+
 ## Authentication
 
 ## Employees
