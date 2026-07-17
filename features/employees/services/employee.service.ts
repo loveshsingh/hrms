@@ -11,6 +11,9 @@ import {
   toEmployeeDetailDto,
 } from "../mappers/employee.mapper";
 import { EmployeeDetailDto } from "../dtos/employee-detail.dto";
+import { buildPagination } from "@/lib/pagination/pagination";
+import { PaginatedResponse } from "@/lib/pagination/pagination.types";
+import { EmployeeResponseDto } from "../dtos/employee-response.dto";
 
 export class EmployeeService {
   private async validateUniqueness(
@@ -62,20 +65,16 @@ export class EmployeeService {
     return toEmployeeDetailDto(employee);
   }
 
-  async findMany(params: Partial<EmployeeListQueryInput> = {}) {
+  async findMany(
+    params: Partial<EmployeeListQueryInput> = {},
+  ): Promise<PaginatedResponse<EmployeeResponseDto>> {
     const { employees, total } = await employeeRepository.findMany(params);
     const page = params.page ?? 1;
     const pageSize = params.pageSize ?? 20;
-    const totalPages = Math.ceil(total / pageSize);
 
     return {
       items: employees.map(toEmployeeResponseDto),
-      pagination: {
-        page,
-        pageSize,
-        total,
-        totalPages,
-      },
+      pagination: buildPagination(page, pageSize, total),
     };
   }
 

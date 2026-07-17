@@ -1,9 +1,6 @@
 import { z } from "zod";
-import {
-  EmployeeStatus,
-  EmploymentType,
-  Gender,
-} from "@prisma/client";
+import { EmployeeStatus, EmploymentType, Gender } from "@prisma/client";
+import { paginationSchema } from "@/lib/pagination/pagination.validator";
 
 export const createEmployeeSchema = z.object({
   employeeCode: z.string().min(3).max(20),
@@ -63,25 +60,33 @@ export const createEmployeeSchema = z.object({
   designationId: z.string(),
 });
 
-export const updateEmployeeSchema =
-  createEmployeeSchema.partial();
+export const updateEmployeeSchema = createEmployeeSchema.partial();
 
-export type CreateEmployeeInput =
-  z.infer<typeof createEmployeeSchema>;
+export type CreateEmployeeInput = z.infer<typeof createEmployeeSchema>;
 
-export type UpdateEmployeeInput =
-  z.infer<typeof updateEmployeeSchema>;
+export type UpdateEmployeeInput = z.infer<typeof updateEmployeeSchema>;
 
-export const employeeListQuerySchema = z.object({
-  page: z.coerce.number().int().positive().default(1),
-  pageSize: z.coerce.number().int().positive().max(100).default(20),
+export const employeeListQuerySchema = paginationSchema.extend({
   search: z.string().optional(),
+
   status: z.nativeEnum(EmployeeStatus).optional(),
+
   sortBy: z
     .enum(["employeeCode", "firstName", "createdAt", "dateOfJoining"])
     .optional(),
   sortOrder: z.enum(["asc", "desc"]).optional(),
 });
+
+// export const employeeListQuerySchema = z.object({
+//   page: z.coerce.number().int().positive().default(1),
+//   pageSize: z.coerce.number().int().positive().max(100).default(20),
+//   search: z.string().optional(),
+//   status: z.nativeEnum(EmployeeStatus).optional(),
+//   sortBy: z
+//     .enum(["employeeCode", "firstName", "createdAt", "dateOfJoining"])
+//     .optional(),
+//   sortOrder: z.enum(["asc", "desc"]).optional(),
+// });
 
 export type EmployeeListQueryInput = z.infer<typeof employeeListQuerySchema>;
 
