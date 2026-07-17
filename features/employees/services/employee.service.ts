@@ -15,6 +15,7 @@ import { buildPagination } from "@/lib/pagination/pagination";
 import { PaginatedResponse } from "@/lib/pagination/pagination.types";
 import { EmployeeResponseDto } from "../dtos/employee-response.dto";
 import { Logger } from "@/lib/logger/logger";
+import { auditService } from "@/features/audit/services/audit.service";
 
 export class EmployeeService {
   private async validateUniqueness(
@@ -65,6 +66,18 @@ export class EmployeeService {
       resourceId: employee.id,
     });
 
+    await auditService.createLog({
+      companyId: employee.companyId,
+
+      entity: "Employee",
+
+      entityId: employee.id,
+
+      action: "CREATE",
+
+      newValues: employee,
+    });
+
     return employee;
   }
 
@@ -92,6 +105,7 @@ export class EmployeeService {
   }
 
   async update(id: string, data: UpdateEmployeeInput) {
+    const existingEmployee = await this.findById(id);
     const employee = await employeeRepository.findById(id);
 
     if (!employee) {
@@ -111,6 +125,20 @@ export class EmployeeService {
       throw new ApiError(404, "Employee not found.");
     }
 
+    await auditService.createLog({
+      companyId: updatedEmployee.companyId,
+
+      entity: "Employee",
+
+      entityId: id,
+
+      action: "UPDATE",
+
+      oldValues: existingEmployee,
+
+      newValues: updatedEmployee,
+    });
+
     return toEmployeeResponseDto(updatedEmployee);
   }
 
@@ -128,6 +156,18 @@ export class EmployeeService {
     if (result.count === 0) {
       throw new ApiError(404, "Employee not found.");
     }
+
+    await auditService.createLog({
+      companyId: employee.companyId,
+
+      entity: "Employee",
+
+      entityId: id,
+
+      action: "DELETE",
+
+      oldValues: employee,
+    });
 
     return {
       id: employee.id,

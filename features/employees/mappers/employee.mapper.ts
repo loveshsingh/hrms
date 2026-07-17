@@ -25,6 +25,7 @@ export function toEmployeeDetailDto(
 ): EmployeeDetailDto {
   return {
     id: employee.id,
+    companyId: employee.companyId,
     employeeCode: employee.employeeCode,
     firstName: employee.firstName,
     lastName: employee.lastName,

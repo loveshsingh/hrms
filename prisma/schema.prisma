@@ -95,6 +95,12 @@ enum PayrollRunStatus {
   LOCKED
 }
 
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+}
+
 model User {
   id          String   @id @default(cuid())
   supabaseId  String   @unique
@@ -134,6 +140,7 @@ model Company {
   documents EmployeeDocument[]
   attendance Attendance[]
   leaveTypes LeaveType[]
+  auditLogs AuditLog[]
 
   leaveRequests LeaveRequest[]
 
@@ -704,4 +711,34 @@ model PayrollItemComponent {
 
   @@index([companyId])
 
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+
+  companyId   String
+
+  userId      String?
+
+  entity      String
+
+  entityId    String
+
+  action      AuditAction
+
+  oldValues   Json?
+
+  newValues   Json?
+
+  ipAddress   String?
+
+  userAgent   String?
+
+  createdAt   DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+  @@index([entity])
+  @@index([entityId])
 }

@@ -47,6 +47,7 @@ export interface EmployeeEmergencyContactDto {
 export interface EmployeeDetailDto {
   id: string;
   employeeCode: string;
+  companyId: string;
   firstName: string;
   lastName: string;
   fatherName: string | null;
