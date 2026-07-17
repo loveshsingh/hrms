@@ -9,10 +9,16 @@ import {
   createEmployeeSchema,
   employeeListQuerySchema,
 } from "@/features/employees/validators/employee.validator";
+import { getCurrentUser } from "@/lib/auth/current-user";
+import { authorize } from "@/lib/authorization/authorize";
+import { PERMISSIONS } from "@/lib/authorization/permissions";
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = Object.fromEntries(request.nextUrl.searchParams);
+    const user = getCurrentUser();
+
+    authorize(user, PERMISSIONS.EMPLOYEE_READ);
     const validatedParams = employeeListQuerySchema.parse(searchParams);
     const result = await employeeService.findMany(validatedParams);
 
@@ -22,33 +28,19 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(
-  request: NextRequest
-) {
-
+export async function POST(request: NextRequest) {
   try {
+    const body = await request.json();
+    const user = getCurrentUser();
 
-    const body =
-      await request.json();
+    authorize(user, PERMISSIONS.EMPLOYEE_CREATE);
 
-    const validatedData =
-      createEmployeeSchema.parse(body);
+    const validatedData = createEmployeeSchema.parse(body);
 
-    const employee =
-      await employeeService.create(
-        validatedData
-      );
+    const employee = await employeeService.create(validatedData);
 
-    return ApiResponse.success(
-      employee,
-      "Employee created successfully.",
-      201
-    );
-
+    return ApiResponse.success(employee, "Employee created successfully.", 201);
   } catch (error) {
-
     return handleApiError(error);
-
   }
-
 }
