@@ -5,6 +5,7 @@ import type {
   UpdateEmployeeInput,
   EmployeeListQueryInput,
 } from "../validators/employee.validator";
+import { buildSearchFilter } from "@/lib/filters/prisma-filter-builder";
 
 export class EmployeeRepository {
   async create(data: CreateEmployeeInput) {
@@ -85,21 +86,19 @@ export class EmployeeRepository {
     const skip = (page - 1) * pageSize;
     const take = pageSize;
 
+    const searchFilter = buildSearchFilter({
+      search,
+
+      fields: ["employeeCode", "firstName", "lastName", "email"],
+    });
+
     const where: Prisma.EmployeeWhereInput = {
       deletedAt: null,
+      ...searchFilter,
     };
 
     if (status) {
       where.status = status;
-    }
-
-    if (search) {
-      where.OR = [
-        { employeeCode: { contains: search, mode: "insensitive" } },
-        { firstName: { contains: search, mode: "insensitive" } },
-        { lastName: { contains: search, mode: "insensitive" } },
-        { email: { contains: search, mode: "insensitive" } },
-      ];
     }
 
     const orderBy = {
