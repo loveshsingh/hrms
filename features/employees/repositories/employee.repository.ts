@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import type {
   CreateEmployeeInput,
@@ -8,8 +8,11 @@ import type {
 import { buildSearchFilter } from "@/lib/filters/prisma-filter-builder";
 
 export class EmployeeRepository {
-  async create(data: CreateEmployeeInput) {
-    return prisma.employee.create({
+  async create(
+    data: CreateEmployeeInput,
+    db: PrismaClient | Prisma.TransactionClient = prisma,
+  ) {
+    return db.employee.create({
       data,
     });
   }

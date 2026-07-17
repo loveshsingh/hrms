@@ -16,7 +16,7 @@ import { PaginatedResponse } from "@/lib/pagination/pagination.types";
 import { EmployeeResponseDto } from "../dtos/employee-response.dto";
 import { Logger } from "@/lib/logger/logger";
 import { auditService } from "@/features/audit/services/audit.service";
-
+import { prisma } from "@/lib/prisma";
 export class EmployeeService {
   private async validateUniqueness(
     email?: string,
@@ -56,29 +56,31 @@ export class EmployeeService {
       module: "EmployeeService",
       action: "CreateEmployee",
     });
+
     await this.validateUniqueness(data.email, data.employeeCode);
 
-    const employee = await employeeRepository.create(data);
+    return prisma.$transaction(async (tx) => {
+      const employee = await employeeRepository.create(data, tx);
 
-    Logger.info("Employee created successfully", {
-      module: "EmployeeService",
-      action: "CreateEmployee",
-      resourceId: employee.id,
+      Logger.info("Employee created successfully", {
+        module: "EmployeeService",
+        action: "CreateEmployee",
+        resourceId: employee.id,
+      });
+
+      await auditService.createLog(
+        {
+          companyId: employee.companyId,
+          entity: "Employee",
+          entityId: employee.id,
+          action: "CREATE",
+          newValues: employee,
+        },
+        tx,
+      );
+
+      return employee;
     });
-
-    await auditService.createLog({
-      companyId: employee.companyId,
-
-      entity: "Employee",
-
-      entityId: employee.id,
-
-      action: "CREATE",
-
-      newValues: employee,
-    });
-
-    return employee;
   }
 
   async findById(id: string): Promise<EmployeeDetailDto> {
