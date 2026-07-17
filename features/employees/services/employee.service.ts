@@ -14,6 +14,7 @@ import { EmployeeDetailDto } from "../dtos/employee-detail.dto";
 import { buildPagination } from "@/lib/pagination/pagination";
 import { PaginatedResponse } from "@/lib/pagination/pagination.types";
 import { EmployeeResponseDto } from "../dtos/employee-response.dto";
+import { Logger } from "@/lib/logger/logger";
 
 export class EmployeeService {
   private async validateUniqueness(
@@ -50,9 +51,21 @@ export class EmployeeService {
   }
 
   async create(data: CreateEmployeeInput) {
+    Logger.info("Creating employee", {
+      module: "EmployeeService",
+      action: "CreateEmployee",
+    });
     await this.validateUniqueness(data.email, data.employeeCode);
 
-    return employeeRepository.create(data);
+    const employee = await employeeRepository.create(data);
+
+    Logger.info("Employee created successfully", {
+      module: "EmployeeService",
+      action: "CreateEmployee",
+      resourceId: employee.id,
+    });
+
+    return employee;
   }
 
   async findById(id: string): Promise<EmployeeDetailDto> {
@@ -87,6 +100,12 @@ export class EmployeeService {
 
     await this.validateUniqueness(data.email, data.employeeCode, employee);
 
+    Logger.info("Updating employee", {
+      module: "EmployeeService",
+      action: "UpdateEmployee",
+      resourceId: id,
+    });
+
     const updatedEmployee = await employeeRepository.update(id, data);
     if (!updatedEmployee) {
       throw new ApiError(404, "Employee not found.");
@@ -97,6 +116,12 @@ export class EmployeeService {
 
   async delete(id: string) {
     const employee = await this.findById(id);
+
+    Logger.warn("Deleting employee", {
+      module: "EmployeeService",
+      action: "DeleteEmployee",
+      resourceId: id,
+    });
 
     const result = await employeeRepository.softDelete(id);
 
