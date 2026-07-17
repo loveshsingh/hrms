@@ -61,9 +61,10 @@ export class EmployeeRepository {
   }
 
   async softDelete(id: string) {
-    return prisma.employee.update({
+    return prisma.employee.updateMany({
       where: {
         id,
+        deletedAt: null,
       },
       data: {
         deletedAt: new Date(),

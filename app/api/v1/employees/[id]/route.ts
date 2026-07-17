@@ -42,3 +42,25 @@ export async function PATCH(
     return handleApiError(error);
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  {
+    params,
+  }: {
+    params: {
+      id: string;
+    };
+  },
+) {
+  try {
+    const resolvedParams = await params;
+    const { id } = employeeIdSchema.parse(resolvedParams);
+
+    const result = await employeeService.delete(id);
+
+    return ApiResponse.success(result, "Employee deleted successfully.");
+  } catch (error) {
+    return handleApiError(error);
+  }
+}

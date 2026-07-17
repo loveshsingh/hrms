@@ -6,24 +6,48 @@ import type {
   UpdateEmployeeInput,
   EmployeeListQueryInput,
 } from "../validators/employee.validator";
-import { toEmployeeResponseDto, toEmployeeDetailDto } from "../mappers/employee.mapper";
+import {
+  toEmployeeResponseDto,
+  toEmployeeDetailDto,
+} from "../mappers/employee.mapper";
 import { EmployeeDetailDto } from "../dtos/employee-detail.dto";
 
 export class EmployeeService {
+  private async validateUniqueness(
+    email?: string,
+    employeeCode?: string,
+    currentEmployee?: { email: string; employeeCode: string; id: string },
+  ) {
+    if (
+      employeeCode !== undefined &&
+      (!currentEmployee || employeeCode !== currentEmployee.employeeCode)
+    ) {
+      const existingCode =
+        await employeeRepository.findByEmployeeCode(employeeCode);
+      if (
+        existingCode &&
+        (!currentEmployee || existingCode.id !== currentEmployee.id)
+      ) {
+        throw new ApiError(409, "Employee code already exists.");
+      }
+    }
+
+    if (
+      email !== undefined &&
+      (!currentEmployee || email !== currentEmployee.email)
+    ) {
+      const existingEmail = await employeeRepository.findByEmail(email);
+      if (
+        existingEmail &&
+        (!currentEmployee || existingEmail.id !== currentEmployee.id)
+      ) {
+        throw new ApiError(409, "Email already exists.");
+      }
+    }
+  }
+
   async create(data: CreateEmployeeInput) {
-    const existingEmployeeCode = await employeeRepository.findByEmployeeCode(
-      data.employeeCode,
-    );
-
-    if (existingEmployeeCode) {
-      throw new ApiError(409, "Employee code already exists.");
-    }
-
-    const existingEmail = await employeeRepository.findByEmail(data.email);
-
-    if (existingEmail) {
-      throw new ApiError(409, "Email already exists.");
-    }
+    await this.validateUniqueness(data.email, data.employeeCode);
 
     return employeeRepository.create(data);
   }
@@ -62,21 +86,7 @@ export class EmployeeService {
       throw new ApiError(404, "Employee not found.");
     }
 
-    if (data.email !== undefined && data.email !== employee.email) {
-      const existingEmail = await employeeRepository.findByEmail(data.email);
-      if (existingEmail) {
-        throw new ApiError(409, "Email already exists.");
-      }
-    }
-
-    if (data.employeeCode !== undefined && data.employeeCode !== employee.employeeCode) {
-      const existingCode = await employeeRepository.findByEmployeeCode(
-        data.employeeCode
-      );
-      if (existingCode) {
-        throw new ApiError(409, "Employee code already exists.");
-      }
-    }
+    await this.validateUniqueness(data.email, data.employeeCode, employee);
 
     const updatedEmployee = await employeeRepository.update(id, data);
     if (!updatedEmployee) {
@@ -87,9 +97,18 @@ export class EmployeeService {
   }
 
   async delete(id: string) {
-    await this.findById(id);
+    const employee = await this.findById(id);
 
-    return employeeRepository.softDelete(id);
+    const result = await employeeRepository.softDelete(id);
+
+    if (result.count === 0) {
+      throw new ApiError(404, "Employee not found.");
+    }
+
+    return {
+      id: employee.id,
+      message: "Employee deleted successfully.",
+    };
   }
 
   async count() {
