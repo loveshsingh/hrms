@@ -5,7 +5,22 @@ import { handleApiError } from "@/lib/handle-api-error";
 
 import { employeeService } from "@/features/employees/services/employee.service";
 
-import { createEmployeeSchema } from "@/features/employees/validators/employee.validator";
+import {
+  createEmployeeSchema,
+  employeeListQuerySchema,
+} from "@/features/employees/validators/employee.validator";
+
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = Object.fromEntries(request.nextUrl.searchParams);
+    const validatedParams = employeeListQuerySchema.parse(searchParams);
+    const result = await employeeService.findMany(validatedParams);
+
+    return ApiResponse.success(result, "Employees retrieved successfully.");
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
 
 export async function POST(
   request: NextRequest

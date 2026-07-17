@@ -71,3 +71,16 @@ export type CreateEmployeeInput =
 
 export type UpdateEmployeeInput =
   z.infer<typeof updateEmployeeSchema>;
+
+export const employeeListQuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  pageSize: z.coerce.number().int().positive().max(100).default(20),
+  search: z.string().optional(),
+  status: z.nativeEnum(EmployeeStatus).optional(),
+  sortBy: z
+    .enum(["employeeCode", "firstName", "createdAt", "dateOfJoining"])
+    .optional(),
+  sortOrder: z.enum(["asc", "desc"]).optional(),
+});
+
+export type EmployeeListQueryInput = z.infer<typeof employeeListQuerySchema>;

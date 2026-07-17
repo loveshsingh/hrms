@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import type {
   CreateEmployeeInput,
   UpdateEmployeeInput,
+  EmployeeListQueryInput,
 } from "../validators/employee.validator";
 
 export class EmployeeRepository {
@@ -55,15 +56,56 @@ export class EmployeeRepository {
     });
   }
 
-  async findMany() {
-    return prisma.employee.findMany({
-      where: {
-        deletedAt: null,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+  async findMany(params: Partial<EmployeeListQueryInput> = {}) {
+    const {
+      page = 1,
+      pageSize = 20,
+      search,
+      status,
+      sortBy = "createdAt",
+      sortOrder = "desc",
+    } = params;
+
+    const skip = (page - 1) * pageSize;
+    const take = pageSize;
+
+    const where: any = {
+      deletedAt: null,
+    };
+
+    if (status) {
+      where.status = status;
+    }
+
+    if (search) {
+      where.OR = [
+        { employeeCode: { contains: search, mode: "insensitive" } },
+        { firstName: { contains: search, mode: "insensitive" } },
+        { lastName: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    const orderBy = {
+      [sortBy]: sortOrder,
+    };
+
+    const [employees, total] = await prisma.$transaction([
+      prisma.employee.findMany({
+        where,
+        skip,
+        take,
+        orderBy,
+      }),
+      prisma.employee.count({
+        where,
+      }),
+    ]);
+
+    return {
+      employees,
+      total,
+    };
   }
 
   async count() {

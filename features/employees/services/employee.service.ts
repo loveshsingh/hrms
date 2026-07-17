@@ -4,6 +4,7 @@ import { employeeRepository } from "../repositories/employee.repository";
 import type {
   CreateEmployeeInput,
   UpdateEmployeeInput,
+  EmployeeListQueryInput,
 } from "../validators/employee.validator";
 import { toEmployeeResponseDto } from "../mappers/employee.mapper";
 
@@ -36,8 +37,21 @@ export class EmployeeService {
     return toEmployeeResponseDto(employee);;
   }
 
-  async findMany() {
-    return employeeRepository.findMany();
+  async findMany(params: Partial<EmployeeListQueryInput> = {}) {
+    const { employees, total } = await employeeRepository.findMany(params);
+    const page = params.page ?? 1;
+    const pageSize = params.pageSize ?? 20;
+    const totalPages = Math.ceil(total / pageSize);
+
+    return {
+      items: employees.map(toEmployeeResponseDto),
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages,
+      },
+    };
   }
 
   async update(id: string, data: UpdateEmployeeInput) {
