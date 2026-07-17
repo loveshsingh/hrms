@@ -6,7 +6,8 @@ import type {
   UpdateEmployeeInput,
   EmployeeListQueryInput,
 } from "../validators/employee.validator";
-import { toEmployeeResponseDto } from "../mappers/employee.mapper";
+import { toEmployeeResponseDto, toEmployeeDetailDto } from "../mappers/employee.mapper";
+import { EmployeeDetailDto } from "../dtos/employee-detail.dto";
 
 export class EmployeeService {
   async create(data: CreateEmployeeInput) {
@@ -27,14 +28,14 @@ export class EmployeeService {
     return employeeRepository.create(data);
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<EmployeeDetailDto> {
     const employee = await employeeRepository.findById(id);
 
     if (!employee) {
       throw new ApiError(404, "Employee not found.");
     }
 
-    return toEmployeeResponseDto(employee);;
+    return toEmployeeDetailDto(employee);
   }
 
   async findMany(params: Partial<EmployeeListQueryInput> = {}) {

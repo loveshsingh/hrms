@@ -13,9 +13,15 @@ export class EmployeeRepository {
   }
 
   async findById(id: string) {
-    return prisma.employee.findUnique({
+    return prisma.employee.findFirst({
       where: {
         id,
+        deletedAt: null,
+      },
+      include: {
+        department: true,
+        designation: true,
+        bankAccount: true,
       },
     });
   }

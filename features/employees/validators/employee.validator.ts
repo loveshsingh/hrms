@@ -84,3 +84,9 @@ export const employeeListQuerySchema = z.object({
 });
 
 export type EmployeeListQueryInput = z.infer<typeof employeeListQuerySchema>;
+
+export const employeeIdSchema = z.object({
+  id: z.string().cuid("Invalid employee ID format. Must be a UUID."),
+});
+
+export type EmployeeIdInput = z.infer<typeof employeeIdSchema>;
