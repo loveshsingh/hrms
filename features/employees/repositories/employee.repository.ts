@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import type {
   CreateEmployeeInput,
@@ -43,11 +44,19 @@ export class EmployeeRepository {
   }
 
   async update(id: string, data: UpdateEmployeeInput) {
-    return prisma.employee.update({
+    await prisma.employee.updateMany({
       where: {
         id,
+        deletedAt: null,
       },
       data,
+    });
+
+    return prisma.employee.findFirst({
+      where: {
+        id,
+        deletedAt: null,
+      },
     });
   }
 
@@ -75,7 +84,7 @@ export class EmployeeRepository {
     const skip = (page - 1) * pageSize;
     const take = pageSize;
 
-    const where: any = {
+    const where: Prisma.EmployeeWhereInput = {
       deletedAt: null,
     };
 

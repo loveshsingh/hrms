@@ -56,9 +56,34 @@ export class EmployeeService {
   }
 
   async update(id: string, data: UpdateEmployeeInput) {
-    await this.findById(id);
+    const employee = await employeeRepository.findById(id);
 
-    return employeeRepository.update(id, data);
+    if (!employee) {
+      throw new ApiError(404, "Employee not found.");
+    }
+
+    if (data.email !== undefined && data.email !== employee.email) {
+      const existingEmail = await employeeRepository.findByEmail(data.email);
+      if (existingEmail) {
+        throw new ApiError(409, "Email already exists.");
+      }
+    }
+
+    if (data.employeeCode !== undefined && data.employeeCode !== employee.employeeCode) {
+      const existingCode = await employeeRepository.findByEmployeeCode(
+        data.employeeCode
+      );
+      if (existingCode) {
+        throw new ApiError(409, "Employee code already exists.");
+      }
+    }
+
+    const updatedEmployee = await employeeRepository.update(id, data);
+    if (!updatedEmployee) {
+      throw new ApiError(404, "Employee not found.");
+    }
+
+    return toEmployeeResponseDto(updatedEmployee);
   }
 
   async delete(id: string) {
