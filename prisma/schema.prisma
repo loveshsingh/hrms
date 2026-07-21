@@ -101,6 +101,20 @@ enum AuditAction {
   DELETE
 }
 
+enum CalculationMethod {
+  FIXED
+  PERCENTAGE
+  FORMULA
+  RULE
+}
+
+enum FormulaBase {
+  BASIC
+  GROSS
+  CTC
+  CUSTOM
+}
+
 model User {
   id          String   @id @default(cuid())
   supabaseId  String   @unique
@@ -521,31 +535,37 @@ model SalaryComponent {
 
   companyId String
 
-  name String
-
   code String
+
+  name String
 
   type SalaryComponentType
 
-  calculationType SalaryCalculationType
+  calculationMethod CalculationMethod
 
-  isStatutory Boolean @default(false)
+  formulaBase FormulaBase?
+
+  formula String?
 
   isTaxable Boolean @default(true)
 
+  isPfApplicable Boolean @default(false)
+
+  isEsicApplicable Boolean @default(false)
+
   displayOrder Int @default(0)
+
+  isActive Boolean @default(true)
 
   createdAt DateTime @default(now())
 
   updatedAt DateTime @updatedAt
 
-  deletedAt DateTime?
+  payrollItemComponents PayrollItemComponent[]
 
   company Company @relation(fields: [companyId], references: [id])
 
-  salaryStructures SalaryStructure[]
-
-  payrollItemComponents PayrollItemComponent[]
+  salaryStructureItems SalaryStructureItem[]
 
   @@unique([companyId, code])
 
@@ -557,37 +577,58 @@ model SalaryStructure {
 
   id String @id @default(cuid())
 
-  employeeId String
-
   companyId String
 
-  salaryComponentId String
+  employeeId String
 
-  amount Decimal @db.Decimal(12,2)
-
-  percentage Decimal? @db.Decimal(5,2)
+  name String
 
   effectiveFrom DateTime
 
   effectiveTo DateTime?
 
+  isActive Boolean @default(true)
+
   createdAt DateTime @default(now())
 
   updatedAt DateTime @updatedAt
 
-  deletedAt DateTime?
+  company Company @relation(fields:[companyId], references:[id])
 
-  employee Employee @relation(fields: [employeeId], references: [id])
+  employee Employee @relation(fields:[employeeId], references:[id])
 
-  company Company @relation(fields: [companyId], references: [id])
-
-  salaryComponent SalaryComponent @relation(fields: [salaryComponentId], references: [id])
-
-  @@index([employeeId])
+  items SalaryStructureItem[]
 
   @@index([companyId])
 
-  @@index([salaryComponentId])
+  @@index([employeeId])
+}
+
+model SalaryStructureItem {
+
+  id String @id @default(cuid())
+
+  salaryStructureId String
+
+  componentId String
+
+  calculationMethod CalculationMethod
+
+  amount Decimal? @db.Decimal(12,2)
+
+  percentage Decimal? @db.Decimal(8,2)
+
+  formula String?
+
+  formulaBase FormulaBase?
+
+  sequence Int
+
+  salaryStructure SalaryStructure @relation(fields:[salaryStructureId], references:[id])
+
+  component SalaryComponent @relation(fields:[componentId], references:[id])
+
+  createdAt DateTime @default(now())
 
 }
 
